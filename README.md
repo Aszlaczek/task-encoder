@@ -95,14 +95,17 @@ pakiet szyfrogramu `400 CRYPTO_PAYLOAD_INVALID`, a cudza lub nieistniejąca wiad
 
 ## Uruchomienie
 
-Wymagania: JDK 21, Node 22, Docker (z Compose). Konfigurację środowiska przygotuje:
+Wymagania: JDK 21, Node 22, Docker (z Compose). Przygotuj lokalny plik `.env` (ignorowany przez Git), np. kopiując `.env.example` i uzupełniając wartości:
 
 ```bash
-./scripts/init-env.sh
+cp .env.example .env
 ```
 
-Skrypt tworzy ignorowany przez Git plik `.env` z losowym kluczem AES-256 (base64, 32 bajty)
-i odmawia nadpisania istniejącego pliku.
+Wygeneruj klucz AES-256 (32 bajty, Base64) i wpisz go jako `APP_CRYPTO_KEY` w `.env`:
+
+```bash
+openssl rand -base64 32
+```
 
 ### Docker Compose (backend + baza + nginx)
 
