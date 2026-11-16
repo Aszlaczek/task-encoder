@@ -1,0 +1,33 @@
+# System
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+.secrets/
+
+# Java / Maven
+backend/target/
+*.class
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+frontend/.last-run.json
+test-results/
+playwright-report/
+blob-report/
+.last-run.json
+npm-debug.log*
+
+# Logs
+*.log
