@@ -23,11 +23,27 @@ frontend/test-results/
 frontend/playwright-report/
 frontend/blob-report/
 frontend/.last-run.json
+frontend/coverage/
+frontend/.vite/
 test-results/
 playwright-report/
 blob-report/
+coverage/
 .last-run.json
 npm-debug.log*
+
+# Artefakty testów i zrzuty ekranu — nie są częścią projektu
+screenshots/
+**/screenshots/
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.webm
+*.har
+*.zip
+*.trace
+.playwright/
 
 # Logs
 *.log
