@@ -12,14 +12,13 @@ przepływu oraz świadomych uproszczeń względem wersji produkcyjnej.
 
 ## Status
 
-Etap 2 — działający szkielet backendu: Spring Boot, migracja `app_users`, BCrypt, konta
-demonstracyjne i healthcheck. Testy jednostkowe: **9/9**.
+Etap 3 — logowanie sesyjne, CSRF i jednolite odpowiedzi `401`/`403`. Testy backendu: **19/19**.
 
 | Etap | Zakres | Status |
 |---:|---|---|
 | 1 | Inicjalizacja repo, README, `.env.example`, skrypt klucza | ✅ |
 | 2 | Spring Boot, PostgreSQL, konta demonstracyjne | ✅ |
-| 3 | Logowanie sesyjne i CSRF | ⏳ |
+| 3 | Logowanie sesyjne i CSRF | ✅ |
 | 4 | Szyfrowanie i deszyfrowanie AES-256-GCM | ⏳ |
 | 5 | Wiadomości, paginacja i usuwanie | ⏳ |
 | 6 | Docker Compose, nginx i healthchecki | ⏳ |
@@ -50,6 +49,30 @@ demonstracyjne i healthcheck. Testy jednostkowe: **9/9**.
 - usuwanie własnej wiadomości,
 - walidacja danych, CSRF i spójne odpowiedzi błędów,
 - responsywny interfejs z trybem jasnym i ciemnym.
+
+## API
+
+Aktualnie zaimplementowane endpointy:
+
+| Metoda | Ścieżka | Opis |
+|---|---|---|
+| `GET` | `/api/auth/csrf` | token CSRF i nazwy cookie/nagłówka |
+| `POST` | `/api/auth/login` | logowanie sesyjne, zwraca `{ id, username }` |
+| `GET` | `/api/auth/me` | dane zalogowanego użytkownika |
+| `POST` | `/api/auth/logout` | wylogowanie, `204` |
+| `GET` | `/actuator/health` | healthcheck |
+
+Mutacje wymagają nagłówka `X-XSRF-TOKEN` zgodnego z cookie `XSRF-TOKEN`. Brak sesji daje
+`401 UNAUTHENTICATED`, a odrzucony token CSRF `403 CSRF_INVALID`. Błędy mają wspólny format:
+
+```json
+{
+  "code": "INVALID_CREDENTIALS",
+  "message": "Nieprawidłowy login lub hasło.",
+  "timestamp": "2026-11-16T11:47:09Z",
+  "fieldErrors": []
+}
+```
 
 ## Bezpieczeństwo
 

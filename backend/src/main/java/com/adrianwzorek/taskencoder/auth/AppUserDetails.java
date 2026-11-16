@@ -18,9 +18,13 @@ public class AppUserDetails implements UserDetails {
     private final String passwordHash;
 
     public AppUserDetails(AppUser user) {
-        this.id = user.getId();
-        this.username = user.getUsername();
-        this.passwordHash = user.getPasswordHash();
+        this(user.getId(), user.getUsername(), user.getPasswordHash());
+    }
+
+    public AppUserDetails(UUID id, String username, String passwordHash) {
+        this.id = id;
+        this.username = username;
+        this.passwordHash = passwordHash;
     }
 
     public UUID getId() {
