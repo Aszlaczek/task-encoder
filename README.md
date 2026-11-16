@@ -12,7 +12,7 @@ przepływu oraz świadomych uproszczeń względem wersji produkcyjnej.
 
 ## Status
 
-Etap 5 — wiadomości, paginacja i usuwanie (backend). Testy backendu: **45/45**.
+Etap 6 — Docker Compose, nginx i healthchecki (backend gotowy do uruchomienia w kontenerach). Testy backendu: **45/45**.
 
 | Etap | Zakres | Status |
 |---:|---|---|
@@ -21,7 +21,7 @@ Etap 5 — wiadomości, paginacja i usuwanie (backend). Testy backendu: **45/45*
 | 3 | Logowanie sesyjne i CSRF | ✅ |
 | 4 | Szyfrowanie i deszyfrowanie AES-256-GCM | ✅ |
 | 5 | Wiadomości, paginacja i usuwanie | ✅ |
-| 6 | Docker Compose, nginx i healthchecki | ⏳ |
+| 6 | Docker Compose, nginx i healthchecki | ✅ |
 | 7 | Frontend: React, design system, logowanie | ⏳ |
 | 8 | Frontend: panel szyfrowania i wiadomości | ⏳ |
 | 9 | Testy RTL i E2E Playwright | ⏳ |
@@ -95,7 +95,7 @@ pakiet szyfrogramu `400 CRYPTO_PAYLOAD_INVALID`, a cudza lub nieistniejąca wiad
 
 ## Uruchomienie
 
-Wymagania: JDK 21, Node 22, Docker (dla PostgreSQL). Konfigurację środowiska przygotuje:
+Wymagania: JDK 21, Node 22, Docker (z Compose). Konfigurację środowiska przygotuje:
 
 ```bash
 ./scripts/init-env.sh
@@ -103,6 +103,19 @@ Wymagania: JDK 21, Node 22, Docker (dla PostgreSQL). Konfigurację środowiska p
 
 Skrypt tworzy ignorowany przez Git plik `.env` z losowym kluczem AES-256 (base64, 32 bajty)
 i odmawia nadpisania istniejącego pliku.
+
+### Docker Compose (backend + baza + nginx)
+
+```bash
+docker compose up --build
+```
+
+- Aplikacja/nginx: `http://localhost:3000` (proxy `/api` i `/actuator/health` do backendu).
+- Healthcheck: `curl http://localhost:3000/actuator/health`
+- `APP_CRYPTO_KEY` musi być ustawiony w `.env` (inaczej backend nie wystartuje).
+- Zatrzymanie i usunięcie kontenerów: `docker compose down` (wolumen bazy: `docker compose down -v`).
+
+### Lokalnie (bez Compose dla backendu)
 
 Backend wymaga działającego PostgreSQL 16. Samą bazę można uruchomić tak:
 
@@ -123,7 +136,9 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
 curl http://localhost:8080/actuator/health
 ```
 
-Testy jednostkowe backendu nie wymagają bazy ani Dockera:
+### Testy
+
+Testy jednostkowe/slice backendu nie wymagają bazy ani Dockera:
 
 ```bash
 cd backend
