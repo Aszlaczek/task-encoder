@@ -12,14 +12,14 @@ przepływu oraz świadomych uproszczeń względem wersji produkcyjnej.
 
 ## Status
 
-Etap 3 — logowanie sesyjne, CSRF i jednolite odpowiedzi `401`/`403`. Testy backendu: **19/19**.
+Etap 4 — szyfrowanie i deszyfrowanie AES-256-GCM (bez zapisu). Testy backendu: **34/34**.
 
 | Etap | Zakres | Status |
 |---:|---|---|
 | 1 | Inicjalizacja repo, README, `.env.example`, skrypt klucza | ✅ |
 | 2 | Spring Boot, PostgreSQL, konta demonstracyjne | ✅ |
 | 3 | Logowanie sesyjne i CSRF | ✅ |
-| 4 | Szyfrowanie i deszyfrowanie AES-256-GCM | ⏳ |
+| 4 | Szyfrowanie i deszyfrowanie AES-256-GCM | ✅ |
 | 5 | Wiadomości, paginacja i usuwanie | ⏳ |
 | 6 | Docker Compose, nginx i healthchecki | ⏳ |
 | 7 | Frontend: React, design system, logowanie | ⏳ |
@@ -60,10 +60,13 @@ Aktualnie zaimplementowane endpointy:
 | `POST` | `/api/auth/login` | logowanie sesyjne, zwraca `{ id, username }` |
 | `GET` | `/api/auth/me` | dane zalogowanego użytkownika |
 | `POST` | `/api/auth/logout` | wylogowanie, `204` |
+| `POST` | `/api/crypto/encrypt` | szyfrowanie tekstu bez zapisu, zwraca `{ packet }` |
+| `POST` | `/api/crypto/decrypt` | deszyfrowanie pakietu w kontekście zalogowanego użytkownika, zwraca `{ plaintext }` |
 | `GET` | `/actuator/health` | healthcheck |
 
 Mutacje wymagają nagłówka `X-XSRF-TOKEN` zgodnego z cookie `XSRF-TOKEN`. Brak sesji daje
-`401 UNAUTHENTICATED`, a odrzucony token CSRF `403 CSRF_INVALID`. Błędy mają wspólny format:
+`401 UNAUTHENTICATED`, odrzucony token CSRF `403 CSRF_INVALID`, a nieprawidłowy lub cudzy
+pakiet szyfrogramu `400 CRYPTO_PAYLOAD_INVALID`. Błędy mają wspólny format:
 
 ```json
 {

@@ -141,7 +141,8 @@ class AuthControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
                 .andExpect(jsonPath("$.fieldErrors").isArray())
-                .andExpect(jsonPath("$.fieldErrors[0].field").value("username"));
+                .andExpect(jsonPath("$.fieldErrors[*].field",
+                        org.hamcrest.Matchers.containsInAnyOrder("username", "password")));
     }
 
     @Test

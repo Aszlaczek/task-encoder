@@ -1,5 +1,6 @@
 package com.adrianwzorek.taskencoder.common.api;
 
+import com.adrianwzorek.taskencoder.crypto.InvalidCryptoPayloadException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -31,6 +32,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleUnreadableBody(HttpMessageNotReadableException exception) {
         return ApiError.of("MALFORMED_REQUEST", "Treść żądania nie jest poprawnym JSON-em.");
+    }
+
+    @ExceptionHandler(InvalidCryptoPayloadException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleInvalidCryptoPayload(InvalidCryptoPayloadException exception) {
+        // Komunikat ogólny: nie rozróżniamy cudzych, uszkodzonych ani źle sformatowanych pakietów.
+        return ApiError.of("CRYPTO_PAYLOAD_INVALID", "Nieprawidłowy pakiet szyfrogramu.");
     }
 
     @ExceptionHandler(BadCredentialsException.class)
