@@ -1,0 +1,6 @@
+# Normalizacja końców linii w repozytorium.
+* text=auto eol=lf
+
+# Skrypty Maven wrappera muszą zachować swoje natywne końce linii.
+mvnw text eol=lf
+*.cmd text eol=crlf whitespace=-trailing-space

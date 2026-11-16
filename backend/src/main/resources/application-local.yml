@@ -1,0 +1,9 @@
+# Konta demonstracyjne są tworzone wyłącznie w profilu `local`.
+# Poświadczenia są jawne i służą tylko do prezentacji projektu.
+app:
+  demo-users:
+    accounts:
+      - username: alice
+        password: AliceDemo123!
+      - username: bob
+        password: BobDemo1234!

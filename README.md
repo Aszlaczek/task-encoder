@@ -12,12 +12,13 @@ przepływu oraz świadomych uproszczeń względem wersji produkcyjnej.
 
 ## Status
 
-Etap 1 — szkielet repozytorium, konfiguracja środowiska i dokumentacja startowa.
+Etap 2 — działający szkielet backendu: Spring Boot, migracja `app_users`, BCrypt, konta
+demonstracyjne i healthcheck. Testy jednostkowe: **9/9**.
 
 | Etap | Zakres | Status |
 |---:|---|---|
 | 1 | Inicjalizacja repo, README, `.env.example`, skrypt klucza | ✅ |
-| 2 | Spring Boot, PostgreSQL, konta demonstracyjne | ⏳ |
+| 2 | Spring Boot, PostgreSQL, konta demonstracyjne | ✅ |
 | 3 | Logowanie sesyjne i CSRF | ⏳ |
 | 4 | Szyfrowanie i deszyfrowanie AES-256-GCM | ⏳ |
 | 5 | Wiadomości, paginacja i usuwanie | ⏳ |
@@ -62,7 +63,7 @@ Etap 1 — szkielet repozytorium, konfiguracja środowiska i dokumentacja starto
 
 ## Uruchomienie
 
-Pełne instrukcje zostaną dodane wraz z backendem i Compose. Konfigurację środowiska przygotuje:
+Wymagania: JDK 21, Node 22, Docker (dla PostgreSQL). Konfigurację środowiska przygotuje:
 
 ```bash
 ./scripts/init-env.sh
@@ -70,6 +71,32 @@ Pełne instrukcje zostaną dodane wraz z backendem i Compose. Konfigurację śro
 
 Skrypt tworzy ignorowany przez Git plik `.env` z losowym kluczem AES-256 (base64, 32 bajty)
 i odmawia nadpisania istniejącego pliku.
+
+Backend wymaga działającego PostgreSQL 16. Samą bazę można uruchomić tak:
+
+```bash
+docker run --rm -d --name task-encoder-db \
+  -e POSTGRES_DB=task_encoder \
+  -e POSTGRES_USER=task_encoder \
+  -e POSTGRES_PASSWORD=change-me \
+  -p 5432:5432 postgres:16-alpine
+```
+
+Następnie:
+
+```bash
+cd backend
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
+./mvnw spring-boot:run
+curl http://localhost:8080/actuator/health
+```
+
+Testy jednostkowe backendu nie wymagają bazy ani Dockera:
+
+```bash
+cd backend
+./mvnw test
+```
 
 ## Świadome uproszczenia
 
@@ -85,7 +112,7 @@ Projekt celowo używa prostszych rozwiązań niż wersja referencyjna:
 
 ## Konta demonstracyjne
 
-Konta będą dostępne wyłącznie w profilu `local`:
+Konta są tworzone wyłącznie w profilu `local` (domyślnym podczas pracy lokalnej):
 
 | Login | Hasło |
 |---|---|
