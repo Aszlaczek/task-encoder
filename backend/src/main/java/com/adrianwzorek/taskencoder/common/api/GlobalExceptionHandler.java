@@ -1,6 +1,7 @@
 package com.adrianwzorek.taskencoder.common.api;
 
 import com.adrianwzorek.taskencoder.crypto.InvalidCryptoPayloadException;
+import com.adrianwzorek.taskencoder.message.MessageNotFoundException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 /**
  * Zamienia wyjątki warstwy web na jednolity format {@link ApiError}. Komunikaty
@@ -39,6 +41,20 @@ public class GlobalExceptionHandler {
     public ApiError handleInvalidCryptoPayload(InvalidCryptoPayloadException exception) {
         // Komunikat ogólny: nie rozróżniamy cudzych, uszkodzonych ani źle sformatowanych pakietów.
         return ApiError.of("CRYPTO_PAYLOAD_INVALID", "Nieprawidłowy pakiet szyfrogramu.");
+    }
+
+    @ExceptionHandler(MessageNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleMessageNotFound(MessageNotFoundException exception) {
+        // Ten sam komunikat dla braku zasobu i braku dostępu — nie ujawniamy istnienia cudzych wiadomości.
+        return ApiError.of("MESSAGE_NOT_FOUND", "Nie znaleziono wiadomości.");
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleTypeMismatch(MethodArgumentTypeMismatchException exception) {
+        // Nieprawidłowy identyfikator traktujemy jak brak zasobu, bez ujawniania szczegółów.
+        return ApiError.of("MESSAGE_NOT_FOUND", "Nie znaleziono wiadomości.");
     }
 
     @ExceptionHandler(BadCredentialsException.class)

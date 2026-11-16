@@ -45,5 +45,8 @@ screenshots/
 *.trace
 .playwright/
 
+# Lokalne notatki w scripts/ (nie commitować)
+scripts/LOCAL_AGENT_NOTES.md
+
 # Logs
 *.log

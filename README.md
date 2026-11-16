@@ -12,7 +12,7 @@ przepływu oraz świadomych uproszczeń względem wersji produkcyjnej.
 
 ## Status
 
-Etap 4 — szyfrowanie i deszyfrowanie AES-256-GCM (bez zapisu). Testy backendu: **34/34**.
+Etap 5 — wiadomości, paginacja i usuwanie (backend). Testy backendu: **45/45**.
 
 | Etap | Zakres | Status |
 |---:|---|---|
@@ -20,7 +20,7 @@ Etap 4 — szyfrowanie i deszyfrowanie AES-256-GCM (bez zapisu). Testy backendu:
 | 2 | Spring Boot, PostgreSQL, konta demonstracyjne | ✅ |
 | 3 | Logowanie sesyjne i CSRF | ✅ |
 | 4 | Szyfrowanie i deszyfrowanie AES-256-GCM | ✅ |
-| 5 | Wiadomości, paginacja i usuwanie | ⏳ |
+| 5 | Wiadomości, paginacja i usuwanie | ✅ |
 | 6 | Docker Compose, nginx i healthchecki | ⏳ |
 | 7 | Frontend: React, design system, logowanie | ⏳ |
 | 8 | Frontend: panel szyfrowania i wiadomości | ⏳ |
@@ -62,11 +62,17 @@ Aktualnie zaimplementowane endpointy:
 | `POST` | `/api/auth/logout` | wylogowanie, `204` |
 | `POST` | `/api/crypto/encrypt` | szyfrowanie tekstu bez zapisu, zwraca `{ packet }` |
 | `POST` | `/api/crypto/decrypt` | deszyfrowanie pakietu w kontekście zalogowanego użytkownika, zwraca `{ plaintext }` |
+| `POST` | `/api/messages` | szyfrowanie z zapisem, zwraca `{ id, createdAt, packet }` (`201`) |
+| `GET` | `/api/messages` | lista własnych wiadomości (paginacja `page`, `size`), zwraca podsumowania bez pakietu |
+| `GET` | `/api/messages/{id}` | szczegóły własnej wiadomości z pakietem |
+| `POST` | `/api/messages/{id}/decrypt` | odszyfrowanie zapisanej wiadomości, zwraca `{ plaintext }` |
+| `DELETE` | `/api/messages/{id}` | usunięcie własnej wiadomości, `204` |
 | `GET` | `/actuator/health` | healthcheck |
 
 Mutacje wymagają nagłówka `X-XSRF-TOKEN` zgodnego z cookie `XSRF-TOKEN`. Brak sesji daje
-`401 UNAUTHENTICATED`, odrzucony token CSRF `403 CSRF_INVALID`, a nieprawidłowy lub cudzy
-pakiet szyfrogramu `400 CRYPTO_PAYLOAD_INVALID`. Błędy mają wspólny format:
+`401 UNAUTHENTICATED`, odrzucony token CSRF `403 CSRF_INVALID`, nieprawidłowy lub cudzy
+pakiet szyfrogramu `400 CRYPTO_PAYLOAD_INVALID`, a cudza lub nieistniejąca wiadomość
+`404 MESSAGE_NOT_FOUND`. Błędy mają wspólny format:
 
 ```json
 {
