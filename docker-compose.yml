@@ -35,14 +35,19 @@ services:
       start_period: 30s
 
   nginx:
-    image: nginx:alpine
+    build:
+      context: ./frontend
     depends_on:
       backend:
         condition: service_healthy
     ports:
       - "3000:80"
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
 volumes:
   db_data:

@@ -12,7 +12,7 @@ przepływu oraz świadomych uproszczeń względem wersji produkcyjnej.
 
 ## Status
 
-Etap 6 — Docker Compose, nginx i healthchecki (backend gotowy do uruchomienia w kontenerach). Testy backendu: **45/45**.
+Etap 7 — frontend: React, design system i logowanie. Testy: backend **45/45**, frontend **12/12**.
 
 | Etap | Zakres | Status |
 |---:|---|---|
@@ -22,7 +22,7 @@ Etap 6 — Docker Compose, nginx i healthchecki (backend gotowy do uruchomienia 
 | 4 | Szyfrowanie i deszyfrowanie AES-256-GCM | ✅ |
 | 5 | Wiadomości, paginacja i usuwanie | ✅ |
 | 6 | Docker Compose, nginx i healthchecki | ✅ |
-| 7 | Frontend: React, design system, logowanie | ⏳ |
+| 7 | Frontend: React, design system, logowanie | ✅ |
 | 8 | Frontend: panel szyfrowania i wiadomości | ⏳ |
 | 9 | Testy RTL i E2E Playwright | ⏳ |
 | 10 | CI, dokumentacja API i zrzuty ekranu | ⏳ |
@@ -107,16 +107,40 @@ Wygeneruj klucz AES-256 (32 bajty, Base64) i wpisz go jako `APP_CRYPTO_KEY` w `.
 openssl rand -base64 32
 ```
 
-### Docker Compose (backend + baza + nginx)
+### Docker Compose (frontend + backend + baza + nginx)
 
 ```bash
 docker compose up --build
 ```
 
-- Aplikacja/nginx: `http://localhost:3000` (proxy `/api` i `/actuator/health` do backendu).
+- Aplikacja: `http://localhost:3000` — nginx serwuje zbudowany frontend i przekazuje `/api`
+  oraz `/actuator/health` do backendu.
 - Healthcheck: `curl http://localhost:3000/actuator/health`
 - `APP_CRYPTO_KEY` musi być ustawiony w `.env` (inaczej backend nie wystartuje).
 - Zatrzymanie i usunięcie kontenerów: `docker compose down` (wolumen bazy: `docker compose down -v`).
+
+### Frontend (lokalnie)
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+Aplikacja: `http://localhost:5173`. Vite przekazuje `/api` i `/actuator` do
+`http://localhost:8080` (można zmienić przez `VITE_API_PROXY_TARGET`), więc backend trzeba
+uruchomić osobno.
+
+Struktura `frontend/src`:
+
+| Katalog | Zawartość |
+|---|---|
+| `app/` | routing, provider zapytań, layout i ochrona tras |
+| `features/auth/` | logowanie, sesja, mutacje i ekran logowania |
+| `shared/api/` | klient JSON, obsługa CSRF i mapowanie błędów |
+| `shared/ui/` | design system: przyciski, pola, alerty, karty, motyw |
+| `shared/lib/` | drobne helpery (`cn`, motyw jasny/ciemny) |
+| `styles/` | Tailwind CSS 4 i style bazowe |
 
 ### Lokalnie (bez Compose dla backendu)
 
@@ -141,11 +165,20 @@ curl http://localhost:8080/actuator/health
 
 ### Testy
 
-Testy jednostkowe/slice backendu nie wymagają bazy ani Dockera:
+Testy backendu (jednostkowe i slice) nie wymagają bazy ani Dockera:
 
 ```bash
 cd backend
 ./mvnw test
+```
+
+Testy, lint i build frontendu:
+
+```bash
+cd frontend
+npm test
+npm run lint
+npm run build
 ```
 
 ## Świadome uproszczenia

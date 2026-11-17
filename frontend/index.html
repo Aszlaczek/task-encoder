@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Aplikacja do szyfrowania i przechowywania wiadomości. Projekt rekrutacyjny."
+    />
+    <meta name="theme-color" content="#0f172a" />
+    <title>Task Encoder — szyfrowanie wiadomości</title>
+    <script>
+      // Ustawia motyw przed pierwszym renderem, żeby uniknąć mignięcia jasnego tła.
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var dark = stored ? stored === 'dark' : prefersDark;
+          if (dark) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch {
+          // Prywatny tryb przeglądarki może blokować localStorage — motyw zostaje domyślny.
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
