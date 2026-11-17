@@ -1,7 +1,16 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
+import { resetCsrfToken } from '@/shared/api';
 import { loadSession, login, logout } from './api';
 
 export const sessionQueryKey = ['auth', 'session'] as const;
+
+function clearSessionData(queryClient: QueryClient): void {
+  queryClient.setQueryData(sessionQueryKey, null);
+  // Dane wiadomości są prywatne — nie mogą przetrwać zmiany użytkownika w cache.
+  queryClient.removeQueries({ queryKey: ['messages'] });
+  resetCsrfToken();
+}
 
 /**
  * Sesja jest źródłem prawdy o zalogowaniu. `null` oznacza anonimowego użytkownika,
@@ -32,8 +41,15 @@ export function useLogoutMutation() {
 
   return useMutation({
     mutationFn: logout,
-    onSuccess: () => {
-      queryClient.setQueryData(sessionQueryKey, null);
-    },
+    onSuccess: () => clearSessionData(queryClient),
   });
+}
+
+/** Kończy sesję po stronie klienta, np. gdy chroniony endpoint zwróci 401. */
+export function useExpireSession() {
+  const queryClient = useQueryClient();
+
+  return useCallback(() => {
+    clearSessionData(queryClient);
+  }, [queryClient]);
 }

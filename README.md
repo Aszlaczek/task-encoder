@@ -12,7 +12,7 @@ przepływu oraz świadomych uproszczeń względem wersji produkcyjnej.
 
 ## Status
 
-Etap 7 — frontend: React, design system i logowanie. Testy: backend **45/45**, frontend **12/12**.
+Etap 8 — frontend: panel szyfrowania i wiadomości. Testy: backend **45/45**, frontend **27/27**.
 
 | Etap | Zakres | Status |
 |---:|---|---|
@@ -23,7 +23,7 @@ Etap 7 — frontend: React, design system i logowanie. Testy: backend **45/45**,
 | 5 | Wiadomości, paginacja i usuwanie | ✅ |
 | 6 | Docker Compose, nginx i healthchecki | ✅ |
 | 7 | Frontend: React, design system, logowanie | ✅ |
-| 8 | Frontend: panel szyfrowania i wiadomości | ⏳ |
+| 8 | Frontend: panel szyfrowania i wiadomości | ✅ |
 | 9 | Testy RTL i E2E Playwright | ⏳ |
 | 10 | CI, dokumentacja API i zrzuty ekranu | ⏳ |
 
@@ -137,10 +137,19 @@ Struktura `frontend/src`:
 |---|---|
 | `app/` | routing, provider zapytań, layout i ochrona tras |
 | `features/auth/` | logowanie, sesja, mutacje i ekran logowania |
+| `features/crypto/` | formularze szyfrowania i deszyfrowania, zapytania i walidacja |
+| `features/messages/` | lista wiadomości, paginacja, podgląd pakietu, deszyfrowanie i usuwanie |
+| `features/dashboard/` | panel główny łączący obszary funkcjonalne |
 | `shared/api/` | klient JSON, obsługa CSRF i mapowanie błędów |
-| `shared/ui/` | design system: przyciski, pola, alerty, karty, motyw |
+| `shared/ui/` | design system: przyciski, pola, alerty, karty, paginacja, motyw |
 | `shared/lib/` | drobne helpery (`cn`, motyw jasny/ciemny) |
+| `test/` | helpery dla testów React Testing Library i stubów `fetch` |
 | `styles/` | Tailwind CSS 4 i style bazowe |
+
+Panel wiadomości korzysta z TanStack Query (klucze z zapytaniami, `placeholderData` przy
+paginacji, invalidacja cache po mutacjach). Formularze używają React Hook Form z resolverem Zod,
+a błędy pól z backendu są mapowane na odpowiednie kontrolki. Wszystkie operacje wymagające
+sesji obsługują `401` przez wygaśnięcie sesji po stronie klienta.
 
 ### Lokalnie (bez Compose dla backendu)
 
@@ -172,14 +181,18 @@ cd backend
 ./mvnw test
 ```
 
-Testy, lint i build frontendu:
+Testy RTL, lint, formatowanie i build frontendu:
 
 ```bash
 cd frontend
 npm test
 npm run lint
+npm run format:check
 npm run build
 ```
+
+Testy komponentów znajdują się obok testowanych modułów (`*.test.tsx`). Poprawki formatowania
+można nanieść poleceniem `npm run format`, a automatyczne naprawy lintu `npm run lint:fix`.
 
 ## Świadome uproszczenia
 

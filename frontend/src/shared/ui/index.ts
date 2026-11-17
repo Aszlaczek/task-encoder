@@ -1,6 +1,10 @@
 export { Alert } from './Alert';
 export { Button } from './Button';
 export { Card } from './Card';
+export { CodeBlock } from './CodeBlock';
+export { CopyButton } from './CopyButton';
+export { Pagination } from './Pagination';
 export { Spinner } from './Spinner';
+export { Textarea } from './Textarea';
 export { TextField } from './TextField';
 export { ThemeToggle } from './ThemeToggle';
