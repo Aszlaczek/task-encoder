@@ -10,9 +10,11 @@ przepływu oraz świadomych uproszczeń względem wersji produkcyjnej.
 
 **Repozytorium:** <https://github.com/Aszlaczek/task-encoder>
 
+[![CI](https://github.com/Aszlaczek/task-encoder/actions/workflows/ci.yml/badge.svg)](https://github.com/Aszlaczek/task-encoder/actions/workflows/ci.yml)
+
 ## Status
 
-Etap 9 — testy RTL i E2E Playwright. Testy: backend **45/45**, frontend RTL **27/27**, E2E **7/7**.
+Etap 10 — CI, dokumentacja API i zrzuty ekranu. Testy: backend **45/45**, frontend RTL **27/27**, E2E **8/8**.
 
 | Etap | Zakres | Status |
 |---:|---|---|
@@ -25,13 +27,13 @@ Etap 9 — testy RTL i E2E Playwright. Testy: backend **45/45**, frontend RTL **
 | 7 | Frontend: React, design system, logowanie | ✅ |
 | 8 | Frontend: panel szyfrowania i wiadomości | ✅ |
 | 9 | Testy RTL i E2E Playwright | ✅ |
-| 10 | CI, dokumentacja API i zrzuty ekranu | ⏳ |
+| 10 | CI, dokumentacja API i zrzuty ekranu | ✅ |
 
 ## Planowany stack
 
 | Warstwa | Technologie |
 |---|---|
-| Backend | Spring Boot 3.5.16, Java 21, Spring Security, JPA, Flyway |
+| Backend | Spring Boot 3.5.16, Java 21, Spring Security, JPA, Flyway, springdoc-openapi |
 | Baza | PostgreSQL 16 |
 | Frontend | React 19, Vite 7, TypeScript 6, Tailwind CSS 4 |
 | Frontend — stan i formularze | TanStack Query, React Router, React Hook Form, Zod |
@@ -68,6 +70,15 @@ Aktualnie zaimplementowane endpointy:
 | `POST` | `/api/messages/{id}/decrypt` | odszyfrowanie zapisanej wiadomości, zwraca `{ plaintext }` |
 | `DELETE` | `/api/messages/{id}` | usunięcie własnej wiadomości, `204` |
 | `GET` | `/actuator/health` | healthcheck |
+
+Interaktywna dokumentacja jest generowana z kodu przez springdoc-openapi:
+
+- Swagger UI: <http://localhost:3000/api/docs.html>,
+- specyfikacja OpenAPI 3 w JSON: <http://localhost:3000/api/docs>.
+
+Dokumentacja jest publiczna, bo nie zawiera danych użytkowników. Korzystanie z „Try it out”
+wymaga jednak zalogowania i nagłówka `X-XSRF-TOKEN` zgodnego z cookie `XSRF-TOKEN`. Przy
+uruchomieniu frontendu przez Vite ten sam prefiks `/api` działa pod `http://localhost:5173`.
 
 Mutacje wymagają nagłówka `X-XSRF-TOKEN` zgodnego z cookie `XSRF-TOKEN`. Brak sesji daje
 `401 UNAUTHENTICATED`, odrzucony token CSRF `403 CSRF_INVALID`, nieprawidłowy lub cudzy
@@ -205,10 +216,36 @@ npm run test:e2e:install
 npm run test:e2e
 ```
 
-Domyślnie testy używają `http://127.0.0.1:3000`; adres można nadpisać zmienną `E2E_BASE_URL`.
+Główny zestaw ma **8 testów**: logowanie, szyfrowanie, wiadomości, izolacja kont i dokumentacja
+API. Domyślnie używa `http://127.0.0.1:3000`; adres można nadpisać zmienną `E2E_BASE_URL`.
 Jeśli stos już działa, Playwright wykorzystuje go i nie zatrzymuje po testach. W przeciwnym razie
 sam uruchamia `docker compose up --build -d`, czeka na healthcheck i wywołuje `docker compose down`
 po zakończeniu. Tryb interaktywny uruchamia `npm run test:e2e:ui`.
+
+Osobny przebieg generuje 6 zrzutów ekranu (jasny i ciemny motyw logowania, panel, odszyfrowana
+wiadomość, widok mobilny i Swagger UI):
+
+```bash
+cd frontend
+npm run test:screenshots
+```
+
+Pliki trafiają do `frontend/test-results/screenshots/`, który jest ignorowany przez Git. W CI są
+publikowane jako artefakt zamiast być commitowane do repozytorium.
+
+## CI
+
+Workflow `.github/workflows/ci.yml` uruchamia się przy pushu i pull requeście do `main` oraz
+ręcznie (`workflow_dispatch`). Ma trzy równoległe joby:
+
+| Job | Zakres | Artefakt |
+|---|---|---|
+| `backend` | `./mvnw -q test` (Java 21) | raport Surefire |
+| `frontend` | `format:check`, `lint`, `npm test`, `build` (Node 22) | `frontend/dist` |
+| `e2e` | Playwright E2E + zrzuty, Docker Compose | raport HTML, `openapi.json` i PNG |
+
+Klucz `APP_CRYPTO_KEY` jest generowany losowo w kroku E2E (`openssl rand -base64 32`) i nie jest
+zapisywany w repozytorium. Nie trzeba dodawać żadnych GitHub Secrets.
 
 ## Świadome uproszczenia
 
