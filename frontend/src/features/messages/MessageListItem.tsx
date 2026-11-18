@@ -102,7 +102,10 @@ export function MessageListItem({ message, onDeleted }: MessageListItemProps) {
   const busy = decrypt.isPending || remove.isPending;
 
   return (
-    <li className="space-y-3 rounded-lg border border-slate-200 p-4 dark:border-slate-700">
+    <li
+      data-message-id={message.id}
+      className="space-y-3 rounded-lg border border-slate-200 p-4 dark:border-slate-700"
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-0.5">
           <p className="text-sm font-semibold">Wiadomość</p>

@@ -12,7 +12,7 @@ przepływu oraz świadomych uproszczeń względem wersji produkcyjnej.
 
 ## Status
 
-Etap 8 — frontend: panel szyfrowania i wiadomości. Testy: backend **45/45**, frontend **27/27**.
+Etap 9 — testy RTL i E2E Playwright. Testy: backend **45/45**, frontend RTL **27/27**, E2E **7/7**.
 
 | Etap | Zakres | Status |
 |---:|---|---|
@@ -24,7 +24,7 @@ Etap 8 — frontend: panel szyfrowania i wiadomości. Testy: backend **45/45**, 
 | 6 | Docker Compose, nginx i healthchecki | ✅ |
 | 7 | Frontend: React, design system, logowanie | ✅ |
 | 8 | Frontend: panel szyfrowania i wiadomości | ✅ |
-| 9 | Testy RTL i E2E Playwright | ⏳ |
+| 9 | Testy RTL i E2E Playwright | ✅ |
 | 10 | CI, dokumentacja API i zrzuty ekranu | ⏳ |
 
 ## Planowany stack
@@ -131,7 +131,7 @@ Aplikacja: `http://localhost:5173`. Vite przekazuje `/api` i `/actuator` do
 `http://localhost:8080` (można zmienić przez `VITE_API_PROXY_TARGET`), więc backend trzeba
 uruchomić osobno.
 
-Struktura `frontend/src`:
+Struktura frontendu:
 
 | Katalog | Zawartość |
 |---|---|
@@ -145,6 +145,8 @@ Struktura `frontend/src`:
 | `shared/lib/` | drobne helpery (`cn`, motyw jasny/ciemny) |
 | `test/` | helpery dla testów React Testing Library i stubów `fetch` |
 | `styles/` | Tailwind CSS 4 i style bazowe |
+| `e2e/` | testy Playwright oraz helpery cyklu życia Docker Compose |
+| `playwright.config.ts` | konfiguracja E2E: Chromium, `baseURL`, start i zatrzymanie stosu |
 
 Panel wiadomości korzysta z TanStack Query (klucze z zapytaniami, `placeholderData` przy
 paginacji, invalidacja cache po mutacjach). Formularze używają React Hook Form z resolverem Zod,
@@ -193,6 +195,20 @@ npm run build
 
 Testy komponentów znajdują się obok testowanych modułów (`*.test.tsx`). Poprawki formatowania
 można nanieść poleceniem `npm run format`, a automatyczne naprawy lintu `npm run lint:fix`.
+
+Testy end-to-end (Playwright, Chromium) uruchamiamy z katalogu `frontend`. Przed pierwszym
+uruchomieniem trzeba zainstalować przeglądarkę:
+
+```bash
+cd frontend
+npm run test:e2e:install
+npm run test:e2e
+```
+
+Domyślnie testy używają `http://127.0.0.1:3000`; adres można nadpisać zmienną `E2E_BASE_URL`.
+Jeśli stos już działa, Playwright wykorzystuje go i nie zatrzymuje po testach. W przeciwnym razie
+sam uruchamia `docker compose up --build -d`, czeka na healthcheck i wywołuje `docker compose down`
+po zakończeniu. Tryb interaktywny uruchamia `npm run test:e2e:ui`.
 
 ## Świadome uproszczenia
 

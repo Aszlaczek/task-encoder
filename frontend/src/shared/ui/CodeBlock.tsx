@@ -12,6 +12,7 @@ export function CodeBlock({ value, label }: CodeBlockProps) {
       </p>
       <pre
         tabIndex={0}
+        aria-label={label}
         className="max-h-48 overflow-auto whitespace-pre-wrap break-all rounded-lg border border-slate-200 bg-slate-50 p-3 font-mono text-xs leading-relaxed text-slate-800 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
       >
         {value}
