@@ -23,7 +23,8 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 /**
  * Fundament bezpieczeństwa: hasła BCrypt, sesja serwerowa i CSRF oparty o cookie.
- * Publiczne są wyłącznie pobranie tokenu CSRF, logowanie i healthcheck.
+ * Publiczne są pobranie tokenu CSRF, logowanie, healthcheck oraz statyczne zasoby
+ * dokumentacji API. Sama specyfikacja OpenAPI nie zawiera danych użytkowników.
  */
 @Configuration
 @EnableWebSecurity
@@ -88,7 +89,10 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET, "/api/auth/csrf")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/auth/csrf",
+                                "/api/docs", "/api/docs.html", "/api/docs/**",
+                                "/api/swagger-ui/**")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login")
                         .permitAll()

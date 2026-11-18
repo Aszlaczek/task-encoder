@@ -1,4 +1,7 @@
 package com.adrianwzorek.taskencoder.message.api;
 
-public record MessagePlaintextResponse(String plaintext) {
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record MessagePlaintextResponse(
+        @Schema(description = "Odszyfrowany tekst wiadomości", example = "Tajna wiadomość") String plaintext) {
 }
