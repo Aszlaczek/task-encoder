@@ -4,6 +4,8 @@ const baseURL = process.env.E2E_BASE_URL ?? 'http://127.0.0.1:3000';
 
 export default defineConfig({
   testDir: './e2e',
+  // Zrzuty mają własną konfigurację i nie wchodzą do głównego zestawu E2E.
+  testIgnore: ['**/capture/**'],
   fullyParallel: false,
   workers: 1,
   forbidOnly: Boolean(process.env.CI),

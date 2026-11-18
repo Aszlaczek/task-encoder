@@ -58,9 +58,13 @@ export async function createMessageViaUi(page: Page, plaintext: string): Promise
 export async function cleanupMessageAsAlice(page: Page, id: string): Promise<void> {
   await page.goto('/');
 
+  // Po nawigacji React jeszcze nie zdążył zamontować nagłówka — czekamy na
+  // którykolwiek z widoków, zanim podejmiemy decyzję o logowaniu.
   const logoutButton = page.getByRole('button', { name: 'Wyloguj' });
-  const isLoggedIn = await logoutButton.isVisible();
-  if (!isLoggedIn) {
+  const loginButton = page.getByRole('button', { name: 'Zaloguj się' });
+  await expect(logoutButton.or(loginButton).first()).toBeVisible();
+
+  if (await loginButton.isVisible()) {
     await loginAs(page, 'alice');
   } else {
     const username = await page
